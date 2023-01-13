@@ -1,0 +1,901 @@
+---
+title: "Assignment 1"
+author: "Colin Jones (100849896)"
+date: "2023-01-11"
+output:
+  html_document:
+    css: "style.css"
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 3
+    number_sections: false
+    theme: lumen
+---
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.jpg\" style=\"float: right;width: 200px;\"/>')
+   });
+</script>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The version of `R` is as listed below.
+
+```{r}
+version
+```
+
+The version of `Python` is listed below.
+
+```{python}
+import sys
+sys.version
+```
+
+## Objective
+
+The purpose of this Assignment is to recreate the base `R` code of the textbook in higher-level `R` and `Python`. There will be three different blocks of code that do the same thing: one in base `R`, one in fancy `R`, and one in `Python`. The original base `R` code is taken from <https://hastie.su.domains/ISLR2/Labs/Rmarkdown_Notebooks/Ch2-statlearn-lab.html>. All other code is my own.
+
+## Libraries
+
+First we install the packages needed for this notebook (note that I already have done it so it is commented out). Then we load the libraries.
+
+```{r error=FALSE, warning=FALSE, message=FALSE}
+# install.packages("dplyr", "plotly", "htmlwidgets", "GGally")
+library(dplyr) # Used for fancier R manipulation
+library(plotly) # Used for fancier plots
+library(htmlwidgets) # Used to save plotly plots
+library(GGally) # Used for pairs plots
+```
+
+Next for `Python` we install the packages with `pip`. Again I already have done that in the terminal. You can run it right here with the `%` in front of it (But this is a little hacky).
+
+```{python}
+# %pip install plotly
+# %pip install pandas
+# %pip install numpy
+```
+
+And we load them.
+
+```{python}
+import numpy as np # For vectors, matrices etc.
+import plotly.express as px # For plotting simple graphs
+import plotly.graph_objects as go # For plotting more complex graphs
+import pandas as pd # For data frames
+```
+
+## Basic Commands
+
+### Vectors
+
+The first block of code assigns a vector. Note that the older assignment in `R`, `<-`, is just `=` in `Python`:
+
+```{r}
+# In R
+x <- c(1, 3, 2, 5)
+x
+```
+
+In `Python` we use `[]` to create a list. In order to create a vector we need to use the linear algebra library `numpy`.
+
+```{python}
+# In Python
+x = np.array([1,3,2,5])
+x
+```
+
+Similarly for the next vector with just `=` in `R`.
+
+```{r}
+# In R
+x = c(1, 6, 2)
+x
+```
+
+```{python}
+# In Python
+x = np.array([1, 6, 2])
+x
+```
+
+```{r}
+# In R
+y = c(1, 4, 3)
+```
+
+```{python}
+# In Python
+y = np.array([1, 4, 3])
+```
+
+Next is the `length()` function which for numpy arrays is `shape`.
+
+```{r}
+# In R
+length(x)
+length(y)
+```
+
+And `Python`.
+
+```{python}
+# In Python
+x.shape
+y.shape
+```
+
+And the summation.
+
+```{r}
+# In R
+x + y
+```
+
+```{python}
+# In Python
+x + y
+```
+
+### Variables
+
+Next we look at the `ls()` function. In `Python` it can be done with the `dir()` function. `Python` gives a bit more info with some built-in things and packages.
+
+```{r}
+# In R
+ls()
+```
+
+```{python}
+# In Python
+dir()
+```
+
+Now we remove some variables.
+
+```{r}
+# In R
+rm(x, y)
+ls()
+
+```
+
+```{python}
+# In Python
+del x,y
+dir()
+```
+
+And all objects at once.
+
+```{r}
+# In R
+rm(list = ls())
+```
+
+To delete only user-defined variables in `Python` we only want ones that don't start with `__`.
+
+```{python}
+# In Python
+for obj in dir():
+  if not obj.startswith("__"):
+    del globals()[obj]
+dir()
+
+```
+
+### Asking for help
+
+Next we ask for help with the matrix function. (Uncomment if you choose; it opens a pop up.)
+
+```{r}
+# In R
+# ?matrix
+
+```
+
+```{python}
+# In Python
+import numpy as np # Import again because we just removed it
+# help(np.array)
+
+```
+
+### Matrices (or arrays if you are very dimensional)
+
+Now we build some matrices.
+
+```{r}
+# In R
+x <- matrix(data = c(1, 2, 3, 4), nrow = 2, ncol = 2)
+x
+
+```
+
+For `Python` it is a little bit different. We can pass a single vector but then we have to reshape it to be a matrix.
+
+```{python}
+# In Python
+x = np.array([1,2,3,4]).reshape(2,2)
+x
+```
+
+If you notice `Python` reshaped it by filling rows first. To get the matrix we want we need to transpose it.
+
+```{python}
+# In Python
+x = np.array([1,2,3,4]).reshape(2,2) \
+                       .transpose()
+x
+
+```
+
+This can be done more easily in `R` with the `byrow` flag.
+
+```{r}
+# In R
+x = matrix(c(1, 2, 3, 4), 2, 2, byrow = TRUE)
+
+```
+
+Next we square root and square the matrices.
+
+```{r}
+# In R
+sqrt(x)
+x^2
+```
+
+And `Python`.
+
+```{python}
+# In Python
+np.sqrt(x)
+np.square(x)
+```
+
+### Random numbers
+
+Finally we generate some random numbers. In `Python` we need to specify $\mu$ and $\sigma$ whereas in `R` it is by default 0 and 1. `Python` produces a correlation matrix instead. Also the numbers are different due to different seeds.
+
+```{r}
+# In R
+x <- rnorm(50)
+y <- x + rnorm(50, mean = 50, sd = .1)
+cor(x, y)
+```
+
+```{python}
+# In Python
+x = np.random.normal(0, 1, 50)
+y = x + np.random.normal(50, .1, 50)
+np.corrcoef(x,y)
+```
+
+We can set the seed to make reproducible code.
+
+```{r}
+# In R
+set.seed(3)
+y <- rnorm(100)
+mean(y)
+```
+
+```{python}
+# In Python
+np.random.seed(3)
+y = np.random.normal(0, 1, 100)
+np.mean(y)
+```
+
+Finally we ask for some variances and standard deviations.
+
+```{r}
+# In R
+var(y)
+sqrt(var(y))
+sd(y)
+```
+
+Repeat in `Python`.
+
+```{python}
+# In Python
+np.var(y)
+np.sqrt(np.var(y))
+np.std(y)
+```
+
+## Graphics
+
+`plotly` is a java-based interactive plotting library. It shares many similarities with `ggplot` in `R`. In `Python` there are a bit more nuances, mostly if you want it simple or complicated.
+
+```{r}
+x <- rnorm(100)
+y <- rnorm(100)
+plot(x, y)
+```
+
+Next in fancy `R`.
+
+```{r}
+# In Fancy R
+data.frame(cbind(x,y)) |>
+  plot_ly(x=x, y=y) |>
+  add_markers() |>
+  layout(title="Plot of Y vs X", xaxis=list(title="this is the x-axis"),
+         yaxis=list(title="this is the y-axis"))
+```
+
+And `Python`
+
+```{python}
+# In Python
+import plotly.express as px # Again we got rid of it too with the delete all
+fig = px.scatter(x=np.random.normal(0,1,100), y=np.random.normal(0,1,100),
+                 title="Plot of X vs Y", labels=dict(x="this is the x-axis",
+                                                     y="this is the y-axis"))
+fig.show()
+```
+
+Now to save it.
+
+```{r}
+# In R
+library(htmlwidgets) # Back again
+
+p <- data.frame(cbind(x,y)) |>
+  plot_ly(x=x, y=y) |>
+  add_markers() |>
+  layout(title="Plot of X vs Y", xaxis=list(title="this is the x-axis"),
+         yaxis=list(title="this is the y-axis"))
+
+saveWidget(p, file="scatter.html")
+
+```
+
+And `Python`.
+
+```{python}
+# In Python
+fig = px.scatter(x=np.random.normal(0,1,100), y=np.random.normal(0,1,100),
+                 title="Plot of X vs Y", labels=dict(x="this is the x-axis",
+                                                     y="this is the y-axis"))
+
+fig.write_html("scatter2.html")
+
+```
+
+### Sequences and Surfaces
+
+Next we generate some sequences in `R` and `Python` using the `range()` function. Don't forget `Python` indexes from 0. We also have to use the `np.linspace()` function in `Python`.
+
+```{r}
+# In R
+x <- seq(1, 10)
+x <- 1:10
+x <- seq(-pi, pi, length = 50)
+```
+
+`Python`:
+
+```{python}
+# In Python
+x = range(1,11)
+x = np.linspace(-np.pi, np.pi, 50)
+```
+
+Now that we have a domain, we can define a function and plot it as a contour map as well as a surface.
+
+```{r}
+# In R
+y <- x
+f <- outer(x, y, function(x, y) cos(y) / (1 + x^2))
+contour(x, y, f)
+contour(x, y, f, nlevels = 45, add = T)
+```
+
+I chose a different number of levels due to data visualization standards. The base `R` way is just too cluttered.
+
+```{r}
+# Fancy R
+as.data.frame(cbind(x,y,f)) |>
+  plot_ly(x=x, y=y) |>
+    add_contour(z=matrix(f, nrow = length(y), byrow = TRUE),
+                contours = list(
+                    start=-.8,
+                    end=.8,
+                    size=.1,
+                    showlabels = TRUE,
+                    coloring="lines")) |>
+    layout(title="Contour plot", xaxis=list(title="x"), yaxis=list(title="y"))
+```
+
+For `Python` things are similar but we use the `meshgrid` function.
+
+```{python}
+# In Python
+y = x
+xr,yr = np.meshgrid(x,y) # A way of making a continuous domain of R^2
+f = np.cos(yr) / (1 + xr**2)
+```
+
+```{python}
+# In Python
+import plotly.graph_objects as go # We really shouldn't have deleted everything ...
+
+fig = go.Figure() \
+        .add_contour(x=x,y=y,z=f, contours=dict(
+            start=-.8,
+            end=.8,
+            size=.1,
+            showlabels=True,
+            coloring="lines")) \
+        .update_layout(title="Contour plot") \
+        .update_xaxes(title="x") \
+        .update_yaxes(title="y")
+fig.show()
+
+```
+
+Another surface.
+
+```{r}
+# In R
+fa <- (f - t(f)) / 2
+
+contour(x, y, fa, nlevels = 15)
+
+```
+
+```{r}
+# Fancy R
+as.data.frame(cbind(x,y,fa)) |>
+  plot_ly(x=x, y=y) |>
+    add_contour(z=matrix(fa, nrow = length(y), byrow = TRUE),
+                contours = list(
+                    start=-.8,
+                    end=.8,
+                    size=.1,
+                    showlabels = TRUE,
+                    coloring="lines")) |>
+    layout(title="Contour plot 2", xaxis=list(title="x"), yaxis=list(title="y"))
+
+```
+
+And `Python`.
+
+```{python}
+# In Python
+fa = (f - f.T) / 2
+
+fig = go.Figure() \
+        .add_contour(x=x,y=y,z=fa, contours=dict(
+            start=-.8,
+            end=.8,
+            size=.1,
+            showlabels=True,
+            coloring="lines")) \
+        .update_layout(title="Contour plot") \
+        .update_xaxes(title="x") \
+        .update_yaxes(title="y")
+
+fig.show()
+
+```
+
+Let's fill things in.
+
+```{r}
+# Fancy R
+as.data.frame(cbind(x,y,fa)) |>
+  plot_ly(x=x, y=y) |>
+    add_contour(z=matrix(fa, nrow = length(y), byrow = TRUE),
+                contours = list(
+                    start=-.8,
+                    end=.8,
+                    size=.1,
+                    showlabels = TRUE,
+                    labelfont=list(color="black"))) |>
+    layout(title="Image plot", xaxis=list(title="x"), yaxis=list(title="y"))
+
+```
+
+```{python}
+
+# In python
+fig = go.Figure() \
+        .add_contour(x=x,y=y,z=fa, contours=dict(
+            start=-.8,
+            end=.8,
+            size=.1,
+            showlabels=True,
+            labelfont=dict(color="black"))) \
+        .update_layout(title="Image plot") \
+        .update_xaxes(title="x") \
+        .update_yaxes(title="y")
+fig.show()
+
+```
+
+Going 3D and adding some perspective.
+
+```{r}
+# Fancy R
+as.data.frame(cbind(x,y,fa)) |>
+  plot_ly(x=x, y=y) |>
+    add_surface(z=matrix(fa, nrow = length(y), byrow = TRUE)) |>
+    layout(title="Perspective plot", xaxis=list(title="x"), yaxis=list(title="y"))
+
+```
+
+```{python}
+# In python
+fig = go.Figure() \
+        .add_surface(x=x,y=y,z=fa) \
+        .update_layout(title="Perspective plot") \
+        .update_xaxes(title="x") \
+        .update_yaxes(title="y")
+
+fig.show()
+
+```
+
+## Indexing Data
+
+Now we slice and dice the arrays. Depending on who you ask, remember what you consider to start the natural numbers. First define `A`.
+
+```{r}
+# In R
+A <- matrix(1:16, 4, 4)
+A
+```
+
+`Python`:
+
+```{python}
+# In Python
+A = np.array(range(1,17)).reshape(4,4).transpose()
+A
+
+```
+
+Slice away.
+
+```{r}
+# In R
+A[2, 3]
+```
+
+```{python}
+# In Python
+A[1,2]
+```
+
+```{r}
+# In R
+A[c(1, 3), c(2, 4)]
+```
+
+Not so easy in `Python`. Took a while to find the `ix_` function.
+
+```{python}
+# In Python
+A[(np.ix_([0,2], [1,3]))]
+```
+
+```{r}
+# In R
+A[1:3, 2:4]
+```
+
+```{python}
+# In Python
+A[:3, 1:4]
+```
+
+```{r}
+# In R
+A[1:2, ]
+```
+
+```{python}
+# In Python
+A[:2,:]
+```
+
+```{r}
+# In R
+A[, 1:2]
+
+```
+
+```{python}
+# In Python
+A[:, :2]
+```
+
+```{r}
+# In R
+A[1, ]
+```
+
+```{python}
+# In Python
+A[0,:]
+```
+
+```{r}
+# In R
+A[-c(1, 3), ]
+```
+
+```{python}
+# In Python
+np.delete(A, [0,2], 0)
+```
+
+```{r}
+# In R
+A[-c(1, 3), -c(1,3,4)]
+```
+
+```{python}
+# In Python
+np.delete(np.delete(A, [0,2], 0), [0,2,3], 1).flatten()
+```
+
+```{r}
+# In R
+dim(A)
+```
+
+```{python}
+# In Python
+A.shape
+```
+
+## Loading Data
+
+Now let's get to some data. We read in a data set from the website https://hastie.su.domains/ISLR2/Labs/. It is about cars. Read in and take a look.
+
+```{r}
+# In R
+Auto <- read.csv("Auto.csv", header = T, na.strings = "?", stringsAsFactors = T)
+View(Auto)
+head(Auto)
+dim(Auto)
+```
+
+```{python}
+# In Python
+import pandas as pd
+
+Auto = pd.read_csv("Auto.csv")
+Auto.head()
+Auto.shape
+
+```
+
+```{r}
+# In R
+Auto[1:4, ]
+```
+
+Now `dplyr` comes into the picture.
+
+```{r}
+# Fancy R
+Auto |> slice(1:4)
+```
+
+```{python}
+# In Python
+Auto.iloc[:4,:]
+```
+
+```{r}
+# In R
+Auto <- na.omit(Auto)
+dim(Auto)
+```
+
+```{r}
+# Fancy R
+Auto |> na.omit() |>
+        dim()
+
+```
+
+```{python}
+# In Python
+Auto.dropna().shape
+```
+
+```{r}
+# In R
+names(Auto)
+```
+
+```{r}
+# Fancy R
+Auto |> names()
+```
+
+```{python}
+# In Python
+Auto.columns
+```
+
+## Additional Graphical and Numerical Summaries
+
+Now let's do some more plotting.
+
+```{r}
+# In R
+plot(Auto$cylinders, Auto$mpg)
+```
+
+```{r}
+# Fancy R
+Auto |> plot_ly(x=~cylinders, y=~mpg) |>
+        add_markers() |>
+        layout(title="Number of Cylinders vs Miles per Gallon",
+               xaxis=list(title="Cylinders"),
+               yaxis=list(title="MPG"))
+```
+
+```{python}
+# In Python
+
+fig = px.scatter(Auto, x="cylinders", y="mpg",
+                 title="Number of Cylinders vs Miles per Gallon",
+                 labels=dict(cylinders="Cylinders",
+                 mpg="MPG"))
+
+fig.show()
+
+```
+
+### Box plots
+
+You can `attach()` things if you are so inclined that just makes the variable names available in `R`. The plot remains the same. The document from the textbook website plots many box plots changing one feature at a time. I have put them all together so you don't see so many. Note that `plotly` does not have the `varwidth` option. Instead I added jitter points so you can see how many observations there are.
+
+```{r}
+# In R
+attach(Auto)
+
+cylinders <- as.factor(cylinders)
+plot(cylinders, mpg, col = "red", varwidth = T)
+
+```
+
+```{r}
+# Fancy R
+Auto |> mutate(cylinders = as.factor(cylinders)) |>
+        plot_ly(x=~mpg, y=~cylinders, color="red") |>
+        add_boxplot(line=list(color="red"),marker=list(color="red"), boxpoints="all", jitter=.3 ) |>
+        layout(title="Number of Cylinders vs Miles per Gallon",
+               xaxis=list(title="MPG"),
+               yaxis=list(title="Cylinders"))
+
+```
+
+```{python}
+# In Python
+
+Auto['cylinders'] = Auto['cylinders'].astype("object")
+
+fig = px.box(Auto, x="mpg", y="cylinders", points="all",
+             title="Number of Cylinders vs Miles per Gallon",
+             labels=dict(cylinders="Cylinders", mpg="MPG"))
+
+fig.show()
+
+```
+
+### Histograms
+
+And now for some histograms. Again they plot many of them; I will just plot one version with all the features in it.
+
+```{r}
+# In R
+hist(mpg, col = 2, breaks = 15)
+```
+
+```{r}
+# Fancy R
+Auto |> plot_ly(x=mpg) |>
+        add_histogram(xbins=15, color="red", stroke=list(color="black")) |>
+        layout(title="Histogram of MPG",
+               xaxis=list(title="MPG"),
+               yaxis=list(title="Frequency"))
+```
+
+```{python}
+# In Python
+fig = px.histogram(Auto, x="mpg",
+             title="Number of Cylinders vs Miles per Gallon",
+             labels=dict(mpg="MPG"))
+
+fig.show()
+
+```
+
+### Pairs plot
+
+Finally the pairs plot. Let's not plot them all like they do in the lab because it is too much and overwhelming.
+
+```{r}
+# In R
+pairs(
+    ~ mpg + displacement + horsepower + weight + acceleration,
+    data = Auto
+
+  )
+
+```
+
+And now for an upgrade.
+
+```{r fig.height=8, fig.width=12}
+# Fancy R
+(ggpairs(Auto, columns = c(1,3:6), title="Pairs Plot")) |> ggplotly()
+```
+
+```{python fig.height=10, fig.width=14}
+# In Python
+fig = px.scatter_matrix(Auto[["mpg","displacement","horsepower","weight", "acceleration"]],
+                        title="Pairs Plot", width=1000, height=1000)
+
+fig.show()
+
+```
+
+### Summaries
+
+For the last part we make summaries of the data frames and variables. For the whole frame,
+
+```{r}
+# In R
+summary(Auto)
+
+```
+
+```{r}
+# Fancy R
+Auto |> summary()
+
+```
+
+```{python}
+# In Python
+Auto.describe()
+
+```
+
+And with one variable.
+
+```{r}
+# In R
+summary(mpg)
+
+```
+
+```{r}
+# Fancy R
+Auto |> select(mpg) |>
+        summary()
+
+```
+
+```{python}
+# In Python
+Auto["mpg"].describe()
+
+```
